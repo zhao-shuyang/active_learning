@@ -148,6 +148,7 @@ def farthest_traversal(X):
 
 
 def MFFT(X):
+    #Mismatch-first farthest-traversal
     L = np.array([np.random.randint(len(X))])
     U = np.arange(len(X))
     U = np.array(list(set(U.tolist()) - set(L.tolist())))
@@ -211,6 +212,7 @@ def MFFT(X):
             plot_data2(X, target_func(X), L, S)
 
 def nnp(X, L, U):
+    #Nearest-neighbour prediction
     dist_mat = sklearn.metrics.pairwise.euclidean_distances(X)
     y = target_func(X)
     y2 = np.zeros(len(U))
