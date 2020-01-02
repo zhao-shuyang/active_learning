@@ -21,9 +21,10 @@ The visualization uses an imaginary binary classification problem and randomly g
 
 ## Detailed visualization on the model predictions and sample selection
 ![a1](http://zsy.fi/static/active/MFFT/figure_a1.png)
-
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
 ![b1](http://zsy.fi/static/active/MFFT/figure_b1.png)| ![a2](http://zsy.fi/static/active/MFFT/figure_a2.png)
-![Image description](http://zsy.fi/static/active/MFFT/figure_b2.png)| ![Image description](http://zsy.fi/static/active/MFFT/figure_a3.png)
+![b2](http://zsy.fi/static/active/MFFT/figure_b2.png)| ![a3](http://zsy.fi/static/active/MFFT/figure_a3.png)
 ![Image description](http://zsy.fi/static/active/MFFT/figure_b3.png)| ![Image description](http://zsy.fi/static/active/MFFT/figure_a4.png)
 ![Image description](http://zsy.fi/static/active/MFFT/figure_b4.png)| ![Image description](http://zsy.fi/static/active/MFFT/figure_a5.png)
 ![Image description](http://zsy.fi/static/active/MFFT/figure_b5.png)| ![Image description](http://zsy.fi/static/active/MFFT/figure_a6.png)
