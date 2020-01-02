@@ -1,9 +1,8 @@
 # Active learning with mismatch-first farthest-traversal
 The active learning algorithm of mismatch-first farthest-traversal with visualization
 
-## An imaginary problem for visualization
-
-The visualization uses an binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The labeling budget is 500. In each batch, 100 data points are queried for labels.
+## An imaginary problem
+The visualization uses a binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The labeling budget is 500. In each batch, 100 data points are queried for labels.
 
 ![Image description](http://zsy.fi/static/active/MFFT/figure_0.png)
 
