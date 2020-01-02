@@ -2,7 +2,7 @@
 Active learning is typically used when unlabeled data is abundant, but labels are expensive or difficult to obtain. It aims at learning an optimal model with a limited labeling budget. Mismatch-first farthest-traversal has been proposed for sound classification and sound event detection. However, it has a good potential to be extended to other problems.
 
 ## An imaginary problem
-The visualization of the algorithm uses a binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The labeling budget is 500. In each batch, 100 data points are queried for labels.
+The visualization of the algorithm uses a binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The traget decision boundaries are marked with two blue triangles. The labeling budget is 500. In each batch, 100 data points are queried for labels.
 
 ![Image description](http://zsy.fi/static/active/MFFT/figure_0.png)
 
