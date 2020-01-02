@@ -1,5 +1,5 @@
 # Active learning with mismatch-first farthest-traversal
-The active learning algorithm of mismatch-first farthest-traversal with visualization
+Active learning is typically used when unlabeled data is abundant, but labels are expensive or difficult to obtain. It aims at optimizing a model with a limited labeling budget. Mismatch-first farthest-traversal has been proposed for sound classification and sound event detection. However, it has a good potential to be extended to other problems.
 
 ## An imaginary problem
 The visualization of the algorithm uses a binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The labeling budget is 500. In each batch, 100 data points are queried for labels.
