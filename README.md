@@ -23,12 +23,15 @@ No model available|![a1](http://zsy.fi/static/active/MFFT/figure_a1.png)
 ## Animated labeling processes along with two other sampling strategies
 
 ### Farthest-first traversal
+It maximizes the diversity of selected samples. It does not rely on a model, simply select the farthest data point to the traversed set.
 ![Image description](http://zsy.fi/static/active/FF/FF.gif)
 
 ### Uncertainty sampling
+It completely relies on a model, selecting the samples with lowest prediction certainty.
 ![Image description](http://zsy.fi/static/active/Uncertainty/uncertainty.gif)
 
 
 ### Mismatch-first farthest-traversal
+It relies on both a existing model and the structure of data points. The primary criterion is prediction mismatch between model-predicted labels and nearset-neighbour predicted labels. The second criterion is the distance to the selected samples.
 ![Image description](http://zsy.fi/static/active/MFFT/MFFT.gif)
 
