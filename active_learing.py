@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 import sklearn.metrics.pairwise
 from sklearn.ensemble import GradientBoostingClassifier
-
+import cluster
 
 np.random.seed(0)
 
-n = 5000
-batch_size = 100
-X = np.random.random([n,2])
+n = 100
+batch_size = 10
+X = np.random.random(size=[n,2])
 #cla = svm.SVC(kernel='rbf', gamma='auto', probability=True, tol=1e-8, class_weight='balanced')
 cla = GradientBoostingClassifier()
 #cla = svm.SVC(kernel='linear')
@@ -34,20 +34,20 @@ def plot_data(X, y):
     ax = plt.axes()
     ax.set_xlim([0,1])
     ax.set_ylim([0,1])
-    plt.plot([0.2,0.5], [0.2,0.2], 'b-')
-    plt.plot([0.2,0.2], [0.2,0.5], 'b-')
-    plt.plot([0.2,0.5], [0.5,0.2], 'b-')
+    plt.plot([0.2,0.5], [0.2,0.2], 'r-')
+    plt.plot([0.2,0.2], [0.2,0.5], 'r-')
+    plt.plot([0.2,0.5], [0.5,0.2], 'r-')
     
-    plt.plot([0.8,0.5], [0.8,0.8], 'b-')
-    plt.plot([0.8,0.8], [0.5,0.8], 'b-')
-    plt.plot([0.8,0.5], [0.5,0.8], 'b-')
+    plt.plot([0.8,0.5], [0.8,0.8], 'r-')
+    plt.plot([0.8,0.8], [0.5,0.8], 'r-')
+    plt.plot([0.8,0.5], [0.5,0.8], 'r-')
     
 
     for i in range(len(X)):
         if y[i] == 1: 
-            plt.plot(X[i,0], X[i,1], 'b.')
+            plt.plot(X[i,0], X[i,1], 'r.')
         else:
-            plt.plot(X[i,0], X[i,1], 'g.')
+            plt.plot(X[i,0], X[i,1], 'b.')
     #ax.set_title("Model")
     plt.show()
 
@@ -59,15 +59,15 @@ def plot_data2(X, y, L, S):
 
     for i in range(len(L)):
         if y[L][i] == 1: 
-            ax1.plot(X[L][i,0], X[L][i,1], 'b.')
+            ax1.plot(X[L][i,0], X[L][i,1], 'r.')
         else:
-            ax1.plot(X[L][i,0], X[L][i,1], 'g.')
+            ax1.plot(X[L][i,0], X[L][i,1], 'b.')
 
     for i in range(len(S)):
         if y[S][i] == 1: 
-            ax1.plot(X[S][i,0], X[S][i,1], 'bo')
+            ax1.plot(X[S][i,0], X[S][i,1], 'ro')
         else:
-            ax1.plot(X[S][i,0], X[S][i,1], 'go')
+            ax1.plot(X[S][i,0], X[S][i,1], 'bo')
             
     ax1.set_title("Labeling budget {0}".format(len(L)))
             
@@ -145,7 +145,29 @@ def farthest_traversal(X):
             plot_data(X, cla.predict(X))
             
             
+def MALR(X):
+    dist_mat = sklearn.metrics.pairwise.euclidean_distances(X)
+    cm = cluster.ClusterManager(dist_mat, len(X)/4)
+    cm.perform_clustering()
+    cm.sort_clusters()
+    
+    np.array(X[cm.medoids])
+    y_medoid = target_func(X[cm.medoids]).astype('int')
+    print (np.array(np.where(y_medoid==0)[0]))
+    print (np.array(np.where(y_medoid==1)[0]))
+    
+    
+    ax1 = plt.axes()
+    ax1.set_xlim([0,1])
+    ax1.set_ylim([0,1])
 
+    ax1.scatter(X[cm.medoids[np.array(np.where(y_medoid==0)[0])]][:,0], X[cm.medoids][:,1], marker='^', color='b', s=40)
+    ax1.scatter(X[cm.medoids[np.array(np.where(y_medoid==1)[0])]][:,0], X[cm.medoids][:,1], marker='^', color='r', s=40)
+    #ax1.plot(X[cm.medoids], 'ro')
+    plt.show()
+    return 
+
+            
 
 def MFFT(X):
     #Mismatch-first farthest-traversal
@@ -223,6 +245,7 @@ def nnp(X, L, U):
     return y2
     
 #uncertainty_sampling(X)
-farthest_traversal(X)
+#farthest_traversal(X)
 #MFFT(X)
+MALR(X)
 
