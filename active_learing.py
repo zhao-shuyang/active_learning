@@ -4,11 +4,12 @@ from sklearn import svm
 import sklearn.metrics.pairwise
 from sklearn.ensemble import GradientBoostingClassifier
 import cluster
+import collections
 
 np.random.seed(0)
 
-n = 100
-batch_size = 10
+n = 120
+batch_size = 5
 X = np.random.random(size=[n,2])
 #cla = svm.SVC(kernel='rbf', gamma='auto', probability=True, tol=1e-8, class_weight='balanced')
 cla = GradientBoostingClassifier()
@@ -18,9 +19,9 @@ cla = GradientBoostingClassifier()
 def target_func(X):
     y = np.zeros(len(X))
     for i in range(len(y)):
-        if (X[i,0]> 0.2 and X[i,1]>0.2) and (X[i,1]<0.7-X[i,0]):
+        if (X[i,0]> 0.2 and X[i,1]>0.2) and (X[i,1]<0.8-X[i,0]):
             y[i] = 1
-        elif (X[i,0]< 0.8 and X[i,1]<0.8) and (X[i,1]>1.3-X[i,0]):
+        elif (X[i,0]< 0.8 and X[i,1]<0.8) and (X[i,1]>1.1-X[i,0]):
             y[i] = 1        
         else:
             y[i] = 0
@@ -30,24 +31,31 @@ def random_sampling(X, batch_size):
     selected_indices = np.random.permutation(len(X))
     return (selected_indices[:batch_size])
 
-def plot_data(X, y):
+def plot_data(X, y, L):
     ax = plt.axes()
     ax.set_xlim([0,1])
     ax.set_ylim([0,1])
-    plt.plot([0.2,0.5], [0.2,0.2], 'r-')
-    plt.plot([0.2,0.2], [0.2,0.5], 'r-')
-    plt.plot([0.2,0.5], [0.5,0.2], 'r-')
+    plt.plot([0.2,0.6], [0.2,0.2], 'r-')
+    plt.plot([0.2,0.2], [0.2,0.6], 'r-')
+    plt.plot([0.2,0.6], [0.6,0.2], 'r-')
     
-    plt.plot([0.8,0.5], [0.8,0.8], 'r-')
-    plt.plot([0.8,0.8], [0.5,0.8], 'r-')
-    plt.plot([0.8,0.5], [0.5,0.8], 'r-')
+    plt.plot([0.8,0.3], [0.8,0.8], 'r-')
+    plt.plot([0.8,0.8], [0.3,0.8], 'r-')
+    plt.plot([0.8,0.3], [0.3,0.8], 'r-')
     
 
     for i in range(len(X)):
-        if y[i] == 1: 
-            plt.plot(X[i,0], X[i,1], 'r.')
+        if i in L:
+            if y[i] == 1:
+                plt.scatter(X[i,0], X[i,1], marker='^', color='r', s=40)
+            else:
+                plt.scatter(X[i,0], X[i,1], marker='^', color='b', s=40)
         else:
-            plt.plot(X[i,0], X[i,1], 'b.')
+            if y[i] == 1:
+                plt.scatter(X[i,0], X[i,1], marker='o', color='r', s=40)
+            else:
+                plt.scatter(X[i,0], X[i,1], marker='o', color='b', s=40)
+            #plt.plot(X[i,0], X[i,1], 'b.')
     #ax.set_title("Model")
     plt.show()
 
@@ -59,15 +67,18 @@ def plot_data2(X, y, L, S):
 
     for i in range(len(L)):
         if y[L][i] == 1: 
-            ax1.plot(X[L][i,0], X[L][i,1], 'r.')
+            #ax1.plot(X[L][i,0], X[L][i,1], 'r.')
+            ax1.scatter(X[L][i,0], X[L][i,1], marker='^', color='r', s=40)
         else:
-            ax1.plot(X[L][i,0], X[L][i,1], 'b.')
+            ax1.scatter(X[L][i,0], X[L][i,1], marker='^', color='b', s=40)
 
     for i in range(len(S)):
-        if y[S][i] == 1: 
-            ax1.plot(X[S][i,0], X[S][i,1], 'ro')
+        if y[S][i] == 1:
+            ax1.scatter(X[S][i,0], X[S][i,1], marker='^', color='r', s=40)
+            #ax1.plot(X[S][i,0], X[S][i,1], 'ro')
         else:
-            ax1.plot(X[S][i,0], X[S][i,1], 'bo')
+            ax1.scatter(X[S][i,0], X[S][i,1], marker='^', color='b', s=40)
+            #ax1.plot(X[S][i,0], X[S][i,1], 'bo')
             
     ax1.set_title("Labeling budget {0}".format(len(L)))
             
@@ -92,7 +103,7 @@ def uncertainty_sampling(X):
             plot_data2(X, y, L, S)
         else:
             cla.fit(X[L], target_func(X[L]))
-            plot_data(X, cla.predict(X))
+            plot_data(X, cla.predict(X), L)
 
             #S = random_sampling(U, batch_size)
             
@@ -147,24 +158,53 @@ def farthest_traversal(X):
             
 def MALR(X):
     dist_mat = sklearn.metrics.pairwise.euclidean_distances(X)
+    L = []
+    #U = np.arange(len(X))
+    
     cm = cluster.ClusterManager(dist_mat, len(X)/4)
     cm.perform_clustering()
     cm.sort_clusters()
+    #print (cm.medoids)
     
-    np.array(X[cm.medoids])
-    y_medoid = target_func(X[cm.medoids]).astype('int')
-    print (np.array(np.where(y_medoid==0)[0]))
-    print (np.array(np.where(y_medoid==1)[0]))
+    #print (np.array(np.where(y_medoid==0)[0]))
+    #print (np.array(np.where(y_medoid==1)[0]))
     
+    medoids = collections.deque(cm.medoids)
+    y_medoid = target_func(X[medoids]).astype('int')
+    print (y_medoid)
     
-    ax1 = plt.axes()
-    ax1.set_xlim([0,1])
-    ax1.set_ylim([0,1])
+    while len(L) < 30:
+        ax1 = plt.axes()
+        ax1.set_xlim([0,1])
+        ax1.set_ylim([0,1])
+        
+        for i in range(batch_size):
+            L.append(medoids.popleft())
 
-    ax1.scatter(X[cm.medoids[np.array(np.where(y_medoid==0)[0])]][:,0], X[cm.medoids][:,1], marker='^', color='b', s=40)
-    ax1.scatter(X[cm.medoids[np.array(np.where(y_medoid==1)[0])]][:,0], X[cm.medoids][:,1], marker='^', color='r', s=40)
-    #ax1.plot(X[cm.medoids], 'ro')
-    plt.show()
+
+        for medoid_id in L:
+            print (len(cm.clusters[medoid_id]))
+                
+            if target_func(np.expand_dims(X[medoid_id], axis=0)) == 1:
+                ax1.scatter(X[medoid_id][0], X[medoid_id][1], marker='^', color='r', s=40)
+                for idx in cm.clusters[medoid_id]:
+                    if idx != medoid_id:
+                        ax1.scatter(X[idx][0], X[idx][1], marker='o', color='r', s=40)
+            else:
+                ax1.scatter(X[medoid_id][0], X[medoid_id][1], marker='^', color='b', s=40)
+                for idx in cm.clusters[medoid_id]:
+                    if idx != medoid_id:
+                        ax1.scatter(X[idx][0], X[idx][1], marker='o', color='b', s=40)
+  
+        plt.show()
+
+        LL = []
+        for medoid_id in L:
+            for idx in cm.clusters[medoid_id]:
+                LL.append(idx)
+        cla.fit(X[np.array(LL)], target_func(X[np.array(LL)]))
+        plot_data(X, cla.predict(X), L)
+
     return 
 
             
