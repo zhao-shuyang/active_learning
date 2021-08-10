@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg51969"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="active_learning.svg">
+  <defs
+     id="defs51963" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="356.5765"
+     inkscape:cy="730.26026"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1600"
+     inkscape:window-height="1094"
+     inkscape:window-x="0"
+     inkscape:window-y="33"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata51966">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#c8dcc8;fill-opacity:0.94117647;stroke:none;stroke-width:0.33167285;stroke-miterlimit:4;stroke-dasharray:1.32669127, 1.32669127;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4280-5-3-9"
+       width="206.25211"
+       height="63.541409"
+       x="2.1781478"
+       y="126.97415" />
+    <rect
+       style="fill:#c8c8dc;fill-opacity:0.94117647;stroke:none;stroke-width:0.45343593;stroke-miterlimit:4;stroke-dasharray:1.81374347, 1.81374347;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4479"
+       width="205.71756"
+       height="51.307682"
+       x="2.1781478"
+       y="75.666466" />
+    <rect
+       style="fill:#c8dcc8;fill-opacity:0.94117647;stroke:none;stroke-width:0.29863816;stroke-miterlimit:4;stroke-dasharray:1.19455256, 1.19455256;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4280-5-3"
+       width="206.25211"
+       height="51.514278"
+       x="1.6436058"
+       y="24.152185" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="5.8799291"
+       y="11.556141"
+       id="text52516"><tspan
+         sodipodi:role="line"
+         id="tspan52514"
+         x="5.8799291"
+         y="11.556141"
+         style="stroke-width:0.26458332px">Active Learning</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="6.1232195"
+       y="52.298214"
+       id="text52520"><tspan
+         sodipodi:role="line"
+         id="tspan52518"
+         x="6.1232195"
+         y="52.298214"
+         style="stroke-width:0.26458332px">Problem Setup</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="60.524189"
+       y="35.343136"
+       id="text52524"><tspan
+         sodipodi:role="line"
+         id="tspan52522"
+         x="60.524189"
+         y="35.343136"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Pool-based: Large unlabeled dataset, non-incremental</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="60.77776"
+       y="52.153355"
+       id="text52524-5"><tspan
+         sodipodi:role="line"
+         id="tspan52522-7"
+         x="60.77776"
+         y="52.153355"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Stream-based: Data keeps coming in, to label or to discard </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="60.469074"
+       y="67.120438"
+       id="text52524-5-5"><tspan
+         sodipodi:role="line"
+         id="tspan52522-7-7"
+         x="60.469074"
+         y="67.120438"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Member query synthesis: synthesize new data for  labeleling</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot52562"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Carlito;font-style:normal;font-weight:normal;font-size:26.66666667px;line-height:173.69999886%;letter-spacing:0px;word-spacing:0px;-inkscape-font-specification:Carlito;font-stretch:normal;font-variant:normal"><flowRegion
+         id="flowRegion52564"><rect
+           id="rect52566"
+           width="568.71588"
+           height="234.35539"
+           x="211.12189"
+           y="99.235153" /></flowRegion><flowPara
+         id="flowPara52568"></flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="7.8174829"
+       y="160.39243"
+       id="text52520-9"><tspan
+         sodipodi:role="line"
+         id="tspan52518-0"
+         x="7.8174829"
+         y="160.39243"
+         style="stroke-width:0.26458332px">Query strategy</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.20472"
+       y="142.28851"
+       id="text52605"><tspan
+         sodipodi:role="line"
+         id="tspan52603"
+         x="61.20472"
+         y="142.28851"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.64444447px;font-family:Carlito;-inkscape-font-specification:'Carlito Bold';stroke-width:0.26458332px">Representatives</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.586212"
+       y="170.97754"
+       id="text52605-8"><tspan
+         sodipodi:role="line"
+         id="tspan52603-5"
+         x="61.586212"
+         y="170.97754"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Expected parameter change</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.210091"
+       y="151.80464"
+       id="text52627"><tspan
+         sodipodi:role="line"
+         id="tspan52625"
+         x="61.210091"
+         y="151.80464"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Pediction uncertainty</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.164513"
+       y="161.39246"
+       id="text52627-5"><tspan
+         sodipodi:role="line"
+         id="tspan52625-2"
+         x="61.164513"
+         y="161.39246"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.64444447px;font-family:Carlito;-inkscape-font-specification:'Carlito Bold';stroke-width:0.26458332px">Pediction disagreement</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot52647"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Carlito;font-style:normal;font-weight:normal;font-size:26.66666667px;line-height:173.69999886%;letter-spacing:0px;word-spacing:0px;-inkscape-font-specification:Carlito;font-stretch:normal;font-variant:normal"><flowRegion
+         id="flowRegion52649"><rect
+           id="rect52651"
+           width="349.51279"
+           height="232.33508"
+           x="192.93913"
+           y="362.88498" /></flowRegion><flowPara
+         id="flowPara52653"></flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.930145"
+       y="180.57637"
+       id="text52605-8-6"><tspan
+         sodipodi:role="line"
+         id="tspan52603-5-3"
+         x="61.930145"
+         y="180.57637"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Generating synthetic data</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot52673"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Carlito;font-style:normal;font-weight:normal;font-size:26.66666667px;line-height:173.69999886%;letter-spacing:0px;word-spacing:0px;-inkscape-font-specification:Carlito;font-stretch:normal;font-variant:normal"><flowRegion
+         id="flowRegion52675"><rect
+           id="rect52677"
+           width="284.86301"
+           height="245.46707"
+           x="248.49753"
+           y="391.16925" /></flowRegion><flowPara
+         id="flowPara52679"></flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="6.5329032"
+       y="108.13049"
+       id="text52520-9-4"><tspan
+         sodipodi:role="line"
+         id="tspan52518-0-8"
+         x="6.5329032"
+         y="108.13049"
+         style="stroke-width:0.26458332px">Selection mode</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.072826"
+       y="107.64406"
+       id="text52524-3"><tspan
+         sodipodi:role="line"
+         id="tspan52522-5"
+         x="61.072826"
+         y="107.64406"
+         style="font-size:5.64444447px;stroke-width:0.26458332px;-inkscape-font-specification:'Carlito Bold';font-family:Carlito;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">Batch-mode</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="60.794498"
+       y="95.814072"
+       id="text52524-3-0"><tspan
+         sodipodi:role="line"
+         id="tspan52522-5-4"
+         x="60.794498"
+         y="95.814072"
+         style="font-size:5.64444447px;stroke-width:0.26458332px">Instance-by-instance</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05555534px;line-height:173.69999886%;font-family:Carlito;-inkscape-font-specification:Carlito;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="61.005783"
+       y="118.8997"
+       id="text52524-3-0-8"><tspan
+         sodipodi:role="line"
+         id="tspan52522-5-4-5"
+         x="61.005783"
+         y="118.8997"
+         style="font-size:5.64444447px;stroke-width:0.26458332px;-inkscape-font-specification:'Carlito Bold';font-family:Carlito;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">Subset</tspan></text>
+  </g>
+</svg>
