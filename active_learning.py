@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import svm
+# from sklearn import svm
 import sklearn.metrics.pairwise
 from sklearn.ensemble import GradientBoostingClassifier
 
@@ -10,10 +10,11 @@ np.random.seed(0)
 n = 5000
 batch_size = 100
 X = np.random.random([n,2])
-#cla = svm.SVC(kernel='rbf', gamma='auto', probability=True, tol=1e-8, class_weight='balanced')
+# cla = svm.SVC(kernel='rbf', gamma='auto', probability=True, tol=1e-8, class_weight='balanced')
 cla = GradientBoostingClassifier()
 #cla = svm.SVC(kernel='linear')
 #cla2 = svm.SVC(kernel='linear')
+
 
 def target_func(X):
     y = np.zeros(len(X))
@@ -25,7 +26,8 @@ def target_func(X):
         else:
             y[i] = 0
     return y
-    
+
+
 def random_sampling(X, batch_size):
     selected_indices = np.random.permutation(len(X))
     return (selected_indices[:batch_size])
@@ -48,7 +50,7 @@ def plot_data(X, y):
             plt.plot(X[i,0], X[i,1], 'b.')
         else:
             plt.plot(X[i,0], X[i,1], 'g.')
-    #ax.set_title("Model")
+    # ax.set_title("Model")
     plt.show()
 
 
