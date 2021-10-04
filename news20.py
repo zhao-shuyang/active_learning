@@ -42,24 +42,25 @@ class MismatchFirstFarthestTraversal:
         """
         Farthest-first traversal n samples on the whole unlabeled set, or subset without matched prediction
         """
-        U = self.U if U is None else U
-        nn_dist = np.zeros(len(U))  # Store the nearest neighbour distance
-        tmp_L = self.L
+        tmp_U = np.copy(self.U) if U is None else np.copy(U)  # Unlabeled data, without to be labeled in the batch
+        tmp_L = np.copy(self.L)  # Labeled data and to be labeled in the batch
         selection_batch = []
 
         for i in range(n):
-            if not tmp_L.any():
-                s_index = np.random.randint(len(U))
+            if not tmp_L.any():  # The very first sample is randomly selected
+                s_index = np.random.randint(len(tmp_U))
             else:
-                for j in range(len(U)):
-                    nn_dist[j] = np.min(self.dist_mat[U[j]][tmp_L])
+                nn_dist = np.zeros(len(tmp_U))  # Store the nearest neighbour distance
+                for j in range(len(tmp_U)):
+                    nn_dist[j] = np.min(self.dist_mat[tmp_U[j]][tmp_L])
                 s_index = np.argmax(nn_dist)
 
-            s = U[s_index]
+            s = tmp_U[s_index]
             selection_batch.append(s)
             tmp_L = np.array(self.L.tolist()+[selection_batch])  # Labeled and to be labeled in the same batch
-
-        return np.array(output_batch)
+            tmp_U = np.delete(tmp_U, s_index)
+        print (len(set(selection_batch)))
+        return np.array(selection_batch)
 
     def draw_next_batch(self):
         if self.n_batch == 0:
@@ -76,13 +77,26 @@ if __name__ == '__main__':
     X_train = vectorizer.fit_transform(newsgroups_train.data)
     y_train = newsgroups_train.target
 
-    learner = MismatchFirstFarthestTraversal(X_train)
-    learner.initial_batch_size = 2000
-    
-    selection = learner.draw_next_batch()
-    print(selection)
-    print (y_train[selection])
 
+    learner = MismatchFirstFarthestTraversal(X_train)
+    learner.initial_batch_size = 1000
+
+    """
+    # Testing if nearest neighbour classification works
+    for i in range(100):
+        learner.dist_mat[i, i] = 1  # Exclued itself for nn
+        nn = np.argmin(learner.dist_mat[i])
+        print (y_train[i], y_train[nn])
+    """
+
+
+
+    # selection = learner.draw_next_batch()
+    
+    # selection = np.random.randint(0, X_train.shape[0], 1000)
+    # print(y_train[selection])
+
+    """
     print("Training starts.")
     classifier.fit(X_train[selection], y_train[selection])
     print("Training is done.")
@@ -93,6 +107,6 @@ if __name__ == '__main__':
 
     f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
     print("The average F1 score is ", f1)
-
+    """
 
     
