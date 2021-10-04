@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import sklearn.metrics.pairwise
 from sklearn.ensemble import GradientBoostingClassifier
 
-
 np.random.seed(0)
 
 n = 5000
