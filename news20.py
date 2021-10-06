@@ -17,15 +17,14 @@ def compute_cosine_dist_mat(X):
     return dot_product / norm_product
 
 class ActiveLearner:
-    "The backbone of batch-mode pool-based active learning algorithm."
-    def __init__(self, X, batch_size=20, initial_batch_size=20, classifier=None):
-        if classifier is None:
-            self.classifier = LogisticRegression()
-        else:
-            self.classifier = classifier
-
+    "The general framework of batch-mode pool-based active learning algorithm."
+    def __init__(self, X, batch_size=20, initial_batch_size=None, classifier=LogisticRegression()):
+        # The default classifier to be used is logistic regression
+        
         self.batch_size = batch_size
-        self.initial_batch_size = initial_batch_size
+        self.initial_batch_size = (
+            initial_batch_size if initial_batch_size is not None
+            else batch_size)
         self.n_batch = 0  # Starting the first batch
 
         
@@ -46,6 +45,24 @@ class ActiveLearner:
         
     def train(self):
         self.classifier.fit(self.X[self.L], self.y[self.L])
+
+
+class MAL1(ActiveLearner):
+    "This is the very core medoid-based active learning method. Clustering is performed only once here"
+
+    def compute_dist_mat(self):
+        # Distance matrix, the vectors are assumed to be normalized (Norm of embedding vector is 1).
+        # Thus, inner product is equivalent to cosine similarity
+        self.dist_mat = np.dot(X, X.T)
+        self.dist_mat = 1 - self.dist_mat.toarray()
+
+    def clustering(self, K):
+        self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, K)
+        self.cluster_analyzer.perform_clustering()
+
+    def draw_next_batch(self):
+        pass
+
     
 
 class MismatchFirstFarthestTraversal:
@@ -115,7 +132,7 @@ if __name__ == '__main__':
     #learner = MismatchFirstFarthestTraversal(X_train)
     #learner.initial_batch_size = 1000
 
-    n_batch = 30
+    n_batch = 25
     learner = ActiveLearner(X_train)
     for i in range(n_batch):
         batch = learner.draw_next_batch()
