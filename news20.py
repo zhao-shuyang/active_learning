@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 import time
 
+import cluster
 
 def compute_cosine_dist_mat(X):
     "The computation of cosine distance matrix from vectorized instances"
@@ -15,6 +16,37 @@ def compute_cosine_dist_mat(X):
         np.outer(vec_norms, vec_norms)
     return dot_product / norm_product
 
+class ActiveLearner:
+    "The backbone of batch-mode pool-based active learning algorithm."
+    def __init__(self, X, batch_size=20, initial_batch_size=20, classifier=None):
+        if classifier is None:
+            self.classifier = LogisticRegression()
+        else:
+            self.classifier = classifier
+
+        self.batch_size = batch_size
+        self.initial_batch_size = initial_batch_size
+        self.n_batch = 0  # Starting the first batch
+
+        
+        # Labeled set initially empty
+        self.X = X
+        self.y = np.zeros(X.shape[0])
+        self.L = np.array([])
+        self.U = np.arange(X.shape[0])
+
+    def draw_next_batch(self):
+        s_indices = np.random.randint(0, len(self.U), self.batch_size)
+        return self.U[s_indices]
+
+    def annotate_batch(self, selection_batch, batch_target):
+        self.y[selection_batch] = batch_target
+        self.L = np.array(self.L.tolist() + selection_batch.tolist())  # Labeled and to be labeled in the same batch
+        self.U = np.array(list(set(self.U.tolist()) - set(selection_batch.tolist())))
+        
+    def train(self):
+        self.classifier.fit(self.X[self.L], self.y[self.L])
+    
 
 class MismatchFirstFarthestTraversal:
     "The implementation of mismatch-first farthest-traversal"
@@ -37,6 +69,8 @@ class MismatchFirstFarthestTraversal:
         # Thus, inner product is equivalent to cosine similarity
         self.dist_mat = np.dot(X, X.T)
         self.dist_mat = 1 - self.dist_mat.toarray()
+
+    
 
     def farthest_traversal(self, n, U=None):
         """
@@ -78,8 +112,26 @@ if __name__ == '__main__':
     y_train = newsgroups_train.target
 
 
-    learner = MismatchFirstFarthestTraversal(X_train)
-    learner.initial_batch_size = 1000
+    #learner = MismatchFirstFarthestTraversal(X_train)
+    #learner.initial_batch_size = 1000
+
+    n_batch = 30
+    learner = ActiveLearner(X_train)
+    for i in range(n_batch):
+        batch = learner.draw_next_batch()
+        learner.annotate_batch(batch, y_train[batch])
+        
+    print("Training starts.")    
+    learner.train()
+    print("Training is done.")    
+    
+    X_test = vectorizer.transform(newsgroups_test.data)
+    y_test = newsgroups_test.target
+    y_test_pred = learner.classifier.predict(X_test)
+
+    f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
+    print("The average F1 score is ", f1)
+    
 
     """
     # Testing if nearest neighbour classification works
@@ -101,10 +153,7 @@ if __name__ == '__main__':
     classifier.fit(X_train[selection], y_train[selection])
     print("Training is done.")
     
-    X_test = vectorizer.transform(newsgroups_test.data)
-    y_test = newsgroups_test.target
-    y_test_pred = classifier.predict(X_test)
-
+    
     f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
     print("The average F1 score is ", f1)
     """
