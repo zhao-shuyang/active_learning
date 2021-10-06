@@ -7,19 +7,11 @@ import time
 
 import cluster
 
-def compute_cosine_dist_mat(X):
-    "The computation of cosine distance matrix from vectorized instances"
-
-    dot_product = np.dot(X, X.T)
-    vec_norms = np.linalg.norm(X, axis=1)
-    norm_product = \
-        np.outer(vec_norms, vec_norms)
-    return dot_product / norm_product
 
 class ActiveLearner:
     "The general framework of batch-mode pool-based active learning algorithm."
     def __init__(self, X, batch_size=20, initial_batch_size=None, classifier=LogisticRegression()):
-        # The default classifier to be used is logistic regression
+        "The default classifier to be used is logistic regression"
         
         self.batch_size = batch_size
         self.initial_batch_size = (
@@ -27,14 +19,13 @@ class ActiveLearner:
             else batch_size)
         self.n_batch = 0  # Starting the first batch
 
-        
-        # Labeled set initially empty
-        self.X = X
-        self.y = np.zeros(X.shape[0])
-        self.L = np.array([])
-        self.U = np.arange(X.shape[0])
+        self.X = X  # Training set, each row is a vectorized instance
+        self.y = np.zeros(X.shape[0])  # The labels, assuming initially unlabeled
+        self.L = np.array([])  # indices of labeled instances
+        self.U = np.arange(X.shape[0])  # indices of unlabeled instances
 
     def draw_next_batch(self):
+        "The query strategy. This will be overriden by different active learning methods."
         s_indices = np.random.randint(0, len(self.U), self.batch_size)
         return self.U[s_indices]
 
@@ -45,6 +36,15 @@ class ActiveLearner:
         
     def train(self):
         self.classifier.fit(self.X[self.L], self.y[self.L])
+
+    @staticmethod
+    def compute_cosine_dist_mat(X):
+        "The computation of cosine distance matrix from vectorized instances"
+        dot_product = np.dot(X, X.T)
+        vec_norms = np.linalg.norm(X, axis=1)
+        norm_product = \
+          np.outer(vec_norms, vec_norms)
+        return dot_product / norm_product
 
 
 class MAL1(ActiveLearner):
