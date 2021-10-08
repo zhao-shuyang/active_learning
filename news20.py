@@ -25,6 +25,8 @@ class ActiveLearner:
         self.L = np.array([])  # indices of labeled instances
         self.U = np.arange(X.shape[0])  # indices of unlabeled instances
 
+        self.classifier = classifier
+        
     def draw_next_batch(self):
         "The query strategy. This will be overriden by different active learning methods."
         s_indices = np.random.randint(0, len(self.U), self.batch_size)
@@ -45,7 +47,8 @@ class MAL1(ActiveLearner):
     def __init__(self, *args, **kwargs):
         super(MAL1, self).__init__(*args, **kwargs)
         self.P = np.array([])  # indices of instances with propagated labels
-        
+        self.K = int(self.X.shape[0] / 4)  # Average cluster size of 4
+
     @staticmethod
     def compute_dist_mat(X):
         """
@@ -53,9 +56,10 @@ class MAL1(ActiveLearner):
         It is equivalent to cosine distance when vector representations are normalized.
         """
         dist_mat = np.dot(X, X.T)
-        dist_mat = 1 - self.dist_mat.toarray()
+        dist_mat = 1 - dist_mat.toarray()
+        print("Computation of distance matrix finished.")
         return dist_mat
-    
+
     @staticmethod
     def compute_cosine_dist_mat(X):
         "The computation of cosine distance matrix from vectorized instances"
@@ -70,24 +74,26 @@ class MAL1(ActiveLearner):
         cluster_analyzer.perform_clustering()
         cluster_analyzer.sort_clusters(order_by=order_by)
         return cluster_analyzer
-    
+
     def draw_next_batch(self):
         "Generate medoids and draw the medoids from a deque."
         if not hasattr(self, 'dist_mat'):
-            self.dist_mat = self.compute_dist_mat()
+            self.dist_mat = self.compute_dist_mat(self.X)
         if not hasattr(self, 'cluster_analyzer'):
-            self.cluster_analyzer = self.clustering(self.dist_mat, self.initial_batch_size)
+            self.cluster_analyzer = self.clustering(self.dist_mat, self.K)
             self.medoids = collections.deque(self.cluster_analyzer.medoids)
         selection_batch = []
         if hasattr(self, 'medoids'):
             batch_size = (self.batch_size if self.n_batch == 0
                           else self.initial_batch_size)
+            print (batch_size)
             for i in range(batch_size):
                 if self.medoids:
                     selection_batch.append(self.medoids.popleft())
                 else:
                     break
                     print("Medoids are exhausted.")
+            self.n_batch += 1
             return np.array(selection_batch)
                    
     def annotate_batch(self, selection_batch, batch_target):
@@ -110,37 +116,56 @@ class MAL1(ActiveLearner):
     def train_with_propagated_labels(self):
         self.classifier.fit(self.X[self.P], self.y[self.P])
 
+
+class MismatchFirstFarthestTraversal(MAL1):
+    """
+    The implementation of mismatch-first farthest-traversal.
+    It is supposed to be faster since it does not require the slow PAM algorithm.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(MismatchFirstFarthestTraversal, self).__init__(*args, **kwargs)
+        self.K = int(self.X.shape[0] / 10)  # Average cluster size of 10. The initial batch size should be smaller than 10% of the data.
+
         
+    def draw_next_batch(self):
+        "Generate medoids and draw the medoids from a deque."
+        batch_size = (self.batch_size if self.n_batch == 0
+                      else self.initial_batch_size)
 
+        if not hasattr(self, 'dist_mat'):
+            self.dist_mat = self.compute_dist_mat(self.X)
 
+        if not hasattr(self, 'cluster_analyzer'):
+            self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
+            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)  # Acutually only the two lines of code is different
+            print (self.cluster_analyzer.medoids)
+            self.cluster_analyzer.repartition()
+            self.cluster_analyzer.sort_clusters()
+            print (self.cluster_analyzer.medoids)
+            
+            self.medoids = collections.deque(self.cluster_analyzer.medoids)
 
-class MismatchFirstFarthestTraversal:
-    "The implementation of mismatch-first farthest-traversal"
-
-    def __init__(self, X, batch_size=20, initial_batch_size=400, classifier=None):
-        if classifier is None:
-            self.classifier = LogisticRegression()
-        else:
-            self.classifier = classifier
-
-        self.batch_size = batch_size
-        self.initial_batch_size = initial_batch_size
-        self.n_batch = 0  # Starting the first batch
-
-        # Labeled set initially empty
-        self.L = np.array([])
-        self.U = np.arange(X.shape[0])
-
-        # Distance matrix, the vectors are assumed to be normalized (Norm of embedding vector is 1).
-        # Thus, inner product is equivalent to cosine similarity
-        self.dist_mat = np.dot(X, X.T)
-        self.dist_mat = 1 - self.dist_mat.toarray()
+        selection_batch = []
+        
+        if hasattr(self, 'medoids'):
+            batch_size = (self.batch_size if self.n_batch == 0
+                          else self.initial_batch_size)
+            print (batch_size)
+            for i in range(batch_size):
+                if self.medoids:
+                    selection_batch.append(self.medoids.popleft())
+                else:
+                    break
+                    print("Medoids are exhausted.")
+            self.n_batch += 1
+            return np.array(selection_batch)
 
     
-
     def farthest_traversal(self, n, U=None):
-        """
-        Farthest-first traversal n samples on the whole unlabeled set, or subset without matched prediction
+
+        """        
+        Farthest-first traversal on a subset, assumed with mismatched predictons.
         """
         tmp_U = np.copy(self.U) if U is None else np.copy(U)  # Unlabeled data, without to be labeled in the batch
         tmp_L = np.copy(self.L)  # Labeled data and to be labeled in the batch
@@ -159,12 +184,8 @@ class MismatchFirstFarthestTraversal:
             selection_batch.append(s)
             tmp_L = np.array(self.L.tolist()+[selection_batch])  # Labeled and to be labeled in the same batch
             tmp_U = np.delete(tmp_U, s_index)
-        print (len(set(selection_batch)))
-        return np.array(selection_batch)
 
-    def draw_next_batch(self):
-        if self.n_batch == 0:
-            return self.farthest_traversal(self.initial_batch_size)
+        return np.array(selection_batch)
 
 
 if __name__ == '__main__':
@@ -177,26 +198,29 @@ if __name__ == '__main__':
     X_train = vectorizer.fit_transform(newsgroups_train.data)
     y_train = newsgroups_train.target
 
-
+    X_test = vectorizer.transform(newsgroups_test.data)
+    y_test = newsgroups_test.target
+    
     #learner = MismatchFirstFarthestTraversal(X_train)
     #learner.initial_batch_size = 1000
 
-    n_batch = 25
-    learner = ActiveLearner(X_train)
+    
+    n_batch = 10
+    learner = MismatchFirstFarthestTraversal(X_train, batch_size=200)
     for i in range(n_batch):
         batch = learner.draw_next_batch()
+        print (batch)
         learner.annotate_batch(batch, y_train[batch])
         
-    print("Training starts.")    
-    learner.train()
-    print("Training is done.")    
-    
-    X_test = vectorizer.transform(newsgroups_test.data)
-    y_test = newsgroups_test.target
-    y_test_pred = learner.classifier.predict(X_test)
+        print("Training starts.")
+        learner.train_with_propagated_labels()
+        # learner.train()
+        
+        print("Training is done.")
+        y_test_pred = learner.classifier.predict(X_test)
 
-    f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
-    print("The average F1 score is ", f1)
+        f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
+        print("The average F1 score is ", f1)
     
 
     """

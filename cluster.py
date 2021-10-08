@@ -4,14 +4,35 @@ from collections import Counter
 
 """
 Zhao Shuyang, contact@zhaoshuyang.com
-k-medoid clustering algorithm and manage the clustering results.
+k-medoid clustering usin partition around medoid (PAM) algorithm. Maybe FasterPAM will be added in the future.
+It takes time to digest the paper.
 """
+
+
+def farthest_search(dist_mat, k):
+    """
+    Farthest-first traversal:
+    Spaning the data points by having adding farthest data points to the current set until the cardinality reaches k.
+    """
+    N,N = dist_mat.shape
+    init_medoid = np.random.randint(N)
+    medoids = [init_medoid]
+    print ("Farthest-first traversal of {0} over {1} samples".format(k, N))
+    for i in range(1, k):
+        print (i)
+        dist = np.zeros((N))
+        for j in range(N):
+            dist[j] = np.min(dist_mat[j][np.array(medoids)])
+        medoids.append(np.argmax(dist))
+        
+    return np.array(medoids)
+
 
 class KMedoidClustering():
     def __init__(self, dist_mat, K):
         self.dist_mat = dist_mat  # Distancs matrix
         self.K = int(K)
-        self.cluster_algorithm = KMedoids()
+        self.cluster_algorithm = PAM()
         self.clusters = {}  # key as medoid and value as list of cluster members
         self.medoids = []  # Medoids as a list
 
@@ -27,16 +48,19 @@ class KMedoidClustering():
             curr_cluster = np.where(_nearest_medoids == self.medoids[i])[0]
             self.clusters[self.medoids[i]] = curr_cluster.astype(np.int)
     
-    def sort_clusters(self, order_by='distance'):
+    def sort_clusters(self, order_by='size'):
         if order_by == 'size':
-            medoid_size_tuple = sorted([(len(self.clusters[m]), np.random.random() ,m) for m in self.medoids])
+            medoid_size_tuple = sorted([(len(self.clusters[m]), np.random.random(), m) for m in self.medoids])
             self.medoids = [m for m in reversed([m for (tmp1, tmp2, m) in medoid_size_tuple])]
 
         if order_by == 'distance':
             medoid_dist_mat = self.dist_mat[self.medoids][:,self.medoids]
-            medoid_pmt = self.cluster_algorithm.farthest_search(medoid_dist_mat, len(self.medoids))
+            medoid_pmt = farthest_search(medoid_dist_mat, len(self.medoids))
             self.medoids = self.medoids[medoid_pmt].tolist()
-        
+
+        if order_by == 'random':
+            self.medoids = self.medoids[np.random.permutation(len(self.medoids))]
+
             
     def purity(self, item_classIDs):
         #A list indexed the same as the distance matrix
@@ -68,12 +92,13 @@ class KMedoidClustering():
             print("medoid:{0}".format(medoid))
             cluster = self.clusters[medoid]
             print("cluster members: {0}".format(cluster))
-        
-class KMedoids():
+
+
+class PAM():
     def __init__(self):
         pass
         
-    def run(self, dist_mat, k):
+    def run(self, dist_mat, k, init='farthest'):
         """
         Perform K medoids clustering based on a distance matrix. Initialize the medoids using farthest search
         Args
@@ -84,8 +109,11 @@ class KMedoids():
         - nearest_medoid_idx: Each cluster is represented in a list. Each cluster member is represented as its index in the distance matrix. 
         """
 
-        curr_medoids = self.farthest_search(dist_mat, k) 
-        old_medoids = np.array([-1]*k) 
+        if init == 'farthest':
+            curr_medoids = farthest_search(dist_mat, k)
+        elif init == 'random':
+            curr_medoids = np.random.permutation(len(dist_mat))[:k]
+        old_medoids = np.array([-1]*k)
         new_medoids = np.array([-1]*k)
 
         # Until the medoids stop updating, do the following:
@@ -104,8 +132,8 @@ class KMedoids():
                 
         return curr_medoids, nearest_medoid_idx
 
-        
-    def assign_points_to_clusters(self, medoids, dist_mat):
+    @staticmethod
+    def assign_points_to_clusters(medoids, dist_mat):
         """
         Assign each point to cluster with closest medoid.
         Args
@@ -120,7 +148,8 @@ class KMedoids():
         nearest_medoid_idx[medoids] = medoids
         return nearest_medoid_idx
 
-    def __compute_new_medoid(self, cluster, dist_mat):
+    @staticmethod
+    def __compute_new_medoid(cluster, dist_mat):
         """
         Minimize the total distances to medoids. Maskind the distance matrix to compute the total distances to the nearest medoid.
         Args
@@ -135,22 +164,4 @@ class KMedoids():
         costs = cluster_distances.sum(axis=1)
         return costs.argmin(axis=0, fill_value=10e9)
 
-    def farthest_search(self, dist_mat, k):
-        """
-        Spaning the data points by having adding farthest data points to the current set until the cardinality reaches k.
-        """
-        N,N = dist_mat.shape
-        init_medoid = np.random.randint(N)
-        medoids = [init_medoid]
-        
-        for i in range(1,k):
-            dist = np.zeros((N))
-            for j in range(N):
-                #print (dist_mat[j][np.array(medoids)])
-                dist[j] = np.min(dist_mat[j][np.array(medoids)])
-            #print (dist)
-            medoids.append(np.argmax(dist))
 
-        return np.array(medoids)
-
-        
