@@ -42,11 +42,15 @@ class KMedoidClustering():
             self.clusters[self.medoids[i]] = curr_cluster.astype(np.int)
 
     def repartition(self):
-        _nearest_medoids = self.cluster_algorithm.assign_points_to_clusters(np.array(self.medoids), self.dist_mat)
+        distances_to_medoids = self.dist_mat[:, self.medoids]
+        nearest_medoid = self.medoids[np.argmin(distances_to_medoids, axis=1)]
+        nearest_medoid[self.medoids] = self.medoids # Nearest medoid for the medoids are themselvse
+        
+        #_nearest_medoids = self.cluster_algorithm.assign_points_to_clusters(np.array(self.medoids), self.dist_mat)
         for i in range(len(self.medoids)):
-            curr_cluster = np.where(_nearest_medoids == self.medoids[i])[0]
+            curr_cluster = np.where(nearest_medoid == self.medoids[i])[0]
             self.clusters[self.medoids[i]] = curr_cluster.astype(np.int)
-    
+            
     def sort_clusters(self, order_by='size'):
         if order_by == 'size':
             medoid_size_tuple = sorted([(len(self.clusters[m]), np.random.random(), m) for m in self.medoids])
@@ -142,7 +146,7 @@ class PAM():
         - nearest_medoid_idx: A list with the size of data points in the distance matrix. The index is the data point index as in the distance matrix.
         The value is the index of the nearest medoid.
         """
-        distances_to_medoids = dist_mat[:,medoids]
+        distances_to_medoids = dist_mat[:, medoids]
         nearest_medoid_idx = medoids[np.argmin(distances_to_medoids, axis=1)]
         nearest_medoid_idx[medoids] = medoids
         return nearest_medoid_idx

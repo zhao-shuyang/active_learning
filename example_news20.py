@@ -18,14 +18,15 @@ if __name__ == '__main__':
     y_test = newsgroups_test.target
     
     n_batch = 10
-    learner = MismatchFirstFarthestTraversal(X_train, batch_size=200)
+    learner = MismatchFirstFarthestTraversal(X_train[:2000], batch_size=100)
     for i in range(n_batch):
+        print("Batch {0}:".format(i))
         batch = learner.draw_next_batch()
         learner.annotate_batch(batch, y_train[batch])
         
         print("Training starts.")
-        learner.train_with_propagated_labels()
-        # learner.train()
+        #learner.train_with_propagated_labels()
+        learner.train()
         
         print("Training is done.")
         y_test_pred = learner.classifier.predict(X_test)
