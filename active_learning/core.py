@@ -7,7 +7,7 @@ from . import cluster
 
 class ActiveLearner:
     "The general framework of batch-mode pool-based active learning algorithm."
-    def __init__(self, X, batch_size=20, initial_batch_size=None, classifier=LogisticRegression()):
+    def __init__(self, X, batch_size=20, initial_batch_size=None, classifier=LogisticRegression(max_iter=200)):
         "The default classifier to be used is logistic regression"
         
         self.batch_size = batch_size
@@ -92,19 +92,13 @@ class MAL1(ActiveLearner):
             self.n_batch += 1
             return np.array(selection_batch)
                    
-    def annotate_batch(self, selection_batch, batch_target):
-        "In addition to annotation, propagate the labels from medoids."
-        super(MAL1, self).annotate_batch(selection_batch, batch_target)
-
+    def train_with_propagated_labels(self):
         tmp_P = self.P.tolist()
-        for i, sample in enumerate(selection_batch):
-            self.y[sample] = batch_target[i]
+        for i, sample in enumerate(self.L):
             for cluster_member in self.cluster_analyzer.clusters[sample]:
-                self.y[cluster_member] = batch_target[i]
+                self.y[cluster_member] = self.y[i]
                 tmp_P.append(cluster_member)
         self.P = np.array(tmp_P)
-        
-    def train_with_propagated_labels(self):
         self.classifier.fit(self.X[self.P], self.y[self.P])
 
 
@@ -112,6 +106,7 @@ class MismatchFirstFarthestTraversal(MAL1):
     """
     The implementation of mismatch-first farthest-traversal.
     It is supposed to be faster since it does not require the slow PAM algorithm.
+    This is used in case that some classes are rare.
     """
 
     def __init__(self, *args, **kwargs):
@@ -141,22 +136,26 @@ class MismatchFirstFarthestTraversal(MAL1):
                     break
                     print("Medoids are exhausted. The initial batch size should not be larger than the number of clusters.")
             self.n_batch += 1
+            # self.P = np.array(selection_batch)
             return np.array(selection_batch)
         else:
             # Mismatch first farthest traversal
             batch_size = self.batch_size
             matched_mask, mismatched_mask = self.compare_predictions()
 
-            self.n_batch += 1
-            if np.sum(mismatched_mask) == self.n_batch:
-                return np.nonzero(mismatched_mask)[0]
-            elif np.sum(mismatched_mask) > self.n_batch:
-                return self.farthest_traversal(self.batch_size, np.nonzero(mismatched_mask)[0])
+            if np.sum(mismatched_mask) == self.batch_size:
+                batch_selection = np.nonzero(mismatched_mask)[0]
+            elif np.sum(mismatched_mask) > self.batch_size:
+                batch_selection = self.farthest_traversal(self.batch_size, np.nonzero(mismatched_mask)[0])
             else:
                 selectionA = np.nonzero(mismatched_mask)[0]
                 selectionB = self.farthest_traversal(self.batch_size, np.nonzero(matched_mask)[0])
-                return np.concatenate((selectionA, selectionB))
+                batch_selection = np.concatenate((selectionA, selectionB))
 
+            #self.P = np.concatenate((self.L, np.nonzero(matched_mask)[0]))  # This is used for training with matched predictions
+            self.n_batch += 1
+            return batch_selection
+                                    
     def farthest_traversal(self, n, U=None):
         """        
         Farthest-first traversal on a subset with respect to labeled data points.
@@ -178,7 +177,7 @@ class MismatchFirstFarthestTraversal(MAL1):
             selection_samples.append(s)
             tmp_L = np.array(self.L.tolist()+selection_samples)  # Labeled and to be labeled in the same batch
             tmp_U = np.delete(tmp_U, s_index)
-
+            
         return np.array(selection_samples)
 
     def compare_predictions(self):
@@ -200,10 +199,84 @@ class MismatchFirstFarthestTraversal(MAL1):
         unlabeled_mask = np.zeros(self.X.shape[0], dtype=int)
         unlabeled_mask[self.U] = 1
         matched_mask = unlabeled_mask - mismatched_mask
-        print(np.sum(unlabeled_mask), np.sum(matched_mask), np.sum(mismatched_mask))
+        print("Among {0} unlabeled samples, those with \n MISmatched predictions: {1} \n matched predictions: {2}".format(np.sum(unlabeled_mask), np.sum(mismatched_mask), np.sum(matched_mask)))
         return matched_mask, mismatched_mask
 
-    def annotate_batch(self, selection_batch, batch_target):
-        self.y[selection_batch] = batch_target
-        self.L = np.array(self.L.tolist() + selection_batch.tolist())  # Labeled and to be labeled in the same batch
-        self.U = np.array(list(set(self.U.tolist()) - set(selection_batch.tolist())))
+    def train_with_propagated_labels(self):
+        self.cluster_analyzer.medoids = self.L
+        self.cluster_analyzer.repartition()
+        for sample in self.L:
+            for cluster_member in self.cluster_analyzer.clusters[sample]:
+                self.y[cluster_member] = self.y[sample]
+        self.classifier.fit(self.X, self.y)
+
+
+class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
+    """
+    This is supposed to be used in cases class distribution is even.
+    """
+    def draw_next_batch(self):
+        "Generate medoids and draw the medoids from a deque."
+
+        if not hasattr(self, 'dist_mat'):
+            self.dist_mat = self.compute_dist_mat(self.X)
+
+        if not hasattr(self, 'cluster_analyzer'):
+            self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
+            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
+            self.cluster_analyzer.repartition()
+            self.cluster_analyzer.sort_clusters()
+            self.medoids = collections.deque(self.cluster_analyzer.medoids)
+        if self.n_batch == 0:
+            # Farthest traversal for the frist batch
+            selection_batch = []
+            batch_size = self.initial_batch_size
+            for i in range(batch_size):
+                if self.medoids:
+                    selection_batch.append(self.medoids.popleft())
+                else:
+                    break
+                    print("Medoids are exhausted. The initial batch size should not be larger than the number of clusters.")
+            self.n_batch += 1
+            # self.P = np.array(selection_batch)
+            return np.array(selection_batch)
+        else:
+            # Mismatch first farthest traversal
+            batch_size = self.batch_size
+            matched_mask, mismatched_mask = self.compare_predictions()
+
+            if np.sum(mismatched_mask) == self.batch_size:
+                batch_selection = np.nonzero(mismatched_mask)[0]
+            elif np.sum(mismatched_mask) > self.batch_size:
+                batch_selection = self.largest_neighborhood(self.batch_size, np.nonzero(mismatched_mask)[0])
+            else:
+                selectionA = np.nonzero(mismatched_mask)[0]
+                selectionB = self.largest_neighborhood(self.batch_size, np.nonzero(matched_mask)[0])
+                batch_selection = np.concatenate((selectionA, selectionB))
+
+            #self.P = np.concatenate((self.L, np.nonzero(matched_mask)[0]))  # This is used for training with matched predictions
+            self.n_batch += 1
+            return batch_selection
+
+    def largest_neighborhood(self, n, U=None):
+        """        
+        Selecting samples with largest neighborhood of -first traversal on a subset with respect to labeled data points.
+        """
+        self.cluster_analyzer.medoids = np.concatenate((self.L, U))
+        # This U means unlabeled data with mismatched predictions if exists, otherwise labeled
+        
+        self.cluster_analyzer.repartition()
+        self.cluster_analyzer.sort_clusters(order_by='size')
+        
+        selection_samples = []
+
+        for medoid in self.cluster_analyzer.medoids:
+            if len(selection_samples) >= n:
+                return np.array(selection_samples)
+
+            elif medoid not in self.L:
+                selection_samples.append(medoid)
+                
+        return np.array(selection_samples)
+
+                
