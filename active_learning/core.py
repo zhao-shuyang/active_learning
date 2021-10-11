@@ -198,7 +198,7 @@ class MismatchFirstFarthestTraversal(MAL1):
         self.classifier.fit(self.X, self.y)
 
 
-class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
+class LargestNeighborhood(MismatchFirstFarthestTraversal):
     """
     This is supposed to be used in cases class distribution is even.
     """
@@ -211,7 +211,7 @@ class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
             traversal_size = int((self.initial_batch_size * self.X.shape[0])**0.5)
-            print ("traversal_size: {0}. Among them, the {1} samples with largest neighborhood will be selected in the first stage.".format(traversal_size, self.initial_batch_size))
+            print ("traversal_size: {0}. Among them, the {1} samples with largest neighborhood will be selected.".format(traversal_size, self.initial_batch_size))
                     
             self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, traversal_size)
             self.cluster_analyzer.repartition()
@@ -226,17 +226,25 @@ class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
                 selection_batch.append(self.medoids.popleft())
             else:
                 selection_size = self.batch_size - len(selection_batch)
-                matched_mask, mismatched_mask = self.compare_predictions()
+                traversal_size = int((selection_size * len(self.U))**0.5)
+                print ("traversal_size: {0}. Among them, the {1} samples with largest neighborhood will be selected.".format(traversal_size, self.batch_size))
+                traversal_pool = self.farthest_traversal(traversal_size, self.U)
+                selection = self.largest_neighborhood(selection_size, traversal_pool)
                 
+                # matched_mask, mismatched_mask = self.compare_predictions()
+                """
                 if selection_size <= np.sum(mismatched_mask):
-                    traversal_size = int((selection_size * np.sum(mismatched_mask))**0.5)
+                    # traversal_size = int((selection_size * np.sum(mismatched_mask))**0.5)
+                    traversal_size = int((selection_size * len(self.U))**0.5)
+                    
                     print ("traversal_size: {0}".format(traversal_size))
-                    traversal_pool = self.farthest_traversal(traversal_size, np.nonzero(mismatched_mask)[0])                    
+                    traversal_pool = self.farthest_traversal(traversal_size, self.U)
                     selection = self.largest_neighborhood(selection_size, traversal_pool)
                 else:
                     selectionA = np.nonzero(mismatched_mask)[0]
                     selectionB = self.largest_neighborhood(selection_size - np.sum(mismatched_mask), np.nonzero(matched_mask)[0])
                     selection = np.concatenate((selectionA, selectionB))
+                """
                 selection_batch += selection.tolist()
 
         self.n_batch += 1
