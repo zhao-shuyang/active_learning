@@ -111,7 +111,7 @@ class MismatchFirstFarthestTraversal(MAL1):
 
     def __init__(self, *args, **kwargs):
         super(MismatchFirstFarthestTraversal, self).__init__(*args, **kwargs)
-        self.K = int(self.X.shape[0] / 10)  # Average cluster size of 10. The initial batch size should be smaller than 10% of the data.
+        # self.K = int(self.X.shape[0] / 10)  # Average cluster size of 10. The initial batch size should be smaller than 10% of the data.
         
     def draw_next_batch(self):
         "Generate medoids and draw the medoids from a deque."
@@ -121,40 +121,31 @@ class MismatchFirstFarthestTraversal(MAL1):
 
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
-            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
+            # self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
+            self.cluster_analyzer.medoids = np.random.permutation(self.X.shape[0])[:self.K]
             self.cluster_analyzer.repartition()
             self.cluster_analyzer.sort_clusters()
-            self.medoids = collections.deque(self.cluster_analyzer.medoids)
-        if self.n_batch == 0:
+            self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
+
+        selection_batch = []
+        while len(selection_batch) < self.batch_size:
             # Farthest traversal for the frist batch
-            selection_batch = []
-            batch_size = self.initial_batch_size
-            for i in range(batch_size):
-                if self.medoids:
-                    selection_batch.append(self.medoids.popleft())
-                else:
-                    break
-                    print("Medoids are exhausted. The initial batch size should not be larger than the number of clusters.")
-            self.n_batch += 1
-            # self.P = np.array(selection_batch)
-            return np.array(selection_batch)
-        else:
-            # Mismatch first farthest traversal
-            batch_size = self.batch_size
-            matched_mask, mismatched_mask = self.compare_predictions()
-
-            if np.sum(mismatched_mask) == self.batch_size:
-                batch_selection = np.nonzero(mismatched_mask)[0]
-            elif np.sum(mismatched_mask) > self.batch_size:
-                batch_selection = self.farthest_traversal(self.batch_size, np.nonzero(mismatched_mask)[0])
+            if self.medoids:
+                selection_batch.append(self.medoids.popleft())
             else:
-                selectionA = np.nonzero(mismatched_mask)[0]
-                selectionB = self.farthest_traversal(self.batch_size, np.nonzero(matched_mask)[0])
-                batch_selection = np.concatenate((selectionA, selectionB))
-
-            #self.P = np.concatenate((self.L, np.nonzero(matched_mask)[0]))  # This is used for training with matched predictions
-            self.n_batch += 1
-            return batch_selection
+                selection_size = self.batch_size - len(selection_batch)
+                matched_mask, mismatched_mask = self.compare_predictions()
+                
+                if selection_size <= np.sum(mismatched_mask):
+                    selection = self.farthest_traversal(selection_size, np.nonzero(mismatched_mask)[0])                     
+                else:
+                    selectionA = np.nonzero(mismatched_mask)[0]
+                    selectionB = self.farthest_traversal(selection_size - np.sum(mismatched_mask), np.nonzero(matched_mask)[0])
+                    selection = np.concatenate((selectionA, selectionB))
+                selection_batch += selection.tolist()
+                
+        self.n_batch += 1
+        return np.array(selection_batch)
                                     
     def farthest_traversal(self, n, U=None):
         """        
@@ -224,39 +215,32 @@ class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
             self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
+            #self.cluster_analyzer.medoids = np.random.permutation(self.X.shape[0])[:self.K]
             self.cluster_analyzer.repartition()
             self.cluster_analyzer.sort_clusters()
-            self.medoids = collections.deque(self.cluster_analyzer.medoids)
-        if self.n_batch == 0:
+            self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
+
+        selection_batch = []
+            
+        while len(selection_batch) < self.batch_size:
             # Farthest traversal for the frist batch
-            selection_batch = []
-            batch_size = self.initial_batch_size
-            for i in range(batch_size):
-                if self.medoids:
-                    selection_batch.append(self.medoids.popleft())
-                else:
-                    break
-                    print("Medoids are exhausted. The initial batch size should not be larger than the number of clusters.")
-            self.n_batch += 1
-            # self.P = np.array(selection_batch)
-            return np.array(selection_batch)
-        else:
-            # Mismatch first farthest traversal
-            batch_size = self.batch_size
-            matched_mask, mismatched_mask = self.compare_predictions()
-
-            if np.sum(mismatched_mask) == self.batch_size:
-                batch_selection = np.nonzero(mismatched_mask)[0]
-            elif np.sum(mismatched_mask) > self.batch_size:
-                batch_selection = self.largest_neighborhood(self.batch_size, np.nonzero(mismatched_mask)[0])
+            if self.medoids:
+                selection_batch.append(self.medoids.popleft())
             else:
-                selectionA = np.nonzero(mismatched_mask)[0]
-                selectionB = self.largest_neighborhood(self.batch_size, np.nonzero(matched_mask)[0])
-                batch_selection = np.concatenate((selectionA, selectionB))
+                selection_size = self.batch_size - len(selection_batch)
+                matched_mask, mismatched_mask = self.compare_predictions()
+                
+                if selection_size <= np.sum(mismatched_mask):
+                    selection = self.largest_neighborhood(selection_size, np.nonzero(mismatched_mask)[0])                     
+                else:
+                    selectionA = np.nonzero(mismatched_mask)[0]
+                    selectionB = self.largest_neighborhood(selection_size - np.sum(mismatched_mask), np.nonzero(matched_mask)[0])
+                    selection = np.concatenate((selectionA, selectionB))
+                selection_batch += selection.tolist()
 
-            #self.P = np.concatenate((self.L, np.nonzero(matched_mask)[0]))  # This is used for training with matched predictions
-            self.n_batch += 1
-            return batch_selection
+        self.n_batch += 1
+        return np.array(selection_batch)
+
 
     def largest_neighborhood(self, n, U=None):
         """        
