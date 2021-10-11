@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
 from collections import Counter
-from tqdm import tqdm
 """
 Zhao Shuyang, contact@zhaoshuyang.com
 k-medoid clustering usin partition around medoid (PAM) algorithm. Maybe FasterPAM will be added in the future.
@@ -13,16 +12,27 @@ def farthest_search(dist_mat, k):
     """
     Farthest-first traversal:
     Spaning the data points by having adding farthest data points to the current set until the cardinality reaches k.
+    Dynamic programming implementation
     """
     N,N = dist_mat.shape
     init_medoid = np.random.randint(N)
     medoids = [init_medoid]
     print ("Farthest-first traversal of {0} over {1} samples".format(k, N))
+    nn_dist = np.zeros((N))
+    """
     for i in tqdm(range(1, k)):
-        dist = np.zeros((N))
         for j in range(N):
             dist[j] = np.min(dist_mat[j][np.array(medoids)])
         medoids.append(np.argmax(dist))
+    """
+    for i in range(N):
+        nn_dist[i] = np.min(dist_mat[i][np.array(medoids)])
+        
+    for i in range(1, k):
+        new_medoid = np.argmax(nn_dist)
+        medoids.append(new_medoid)
+        update_mask = dist_mat[new_medoid, :] < nn_dist
+        nn_dist[update_mask] = dist_mat[new_medoid][update_mask]
         
     return np.array(medoids)
 

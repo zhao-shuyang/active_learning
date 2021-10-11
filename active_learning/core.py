@@ -121,8 +121,7 @@ class MismatchFirstFarthestTraversal(MAL1):
 
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
-            # self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
-            self.cluster_analyzer.medoids = np.random.permutation(self.X.shape[0])[:self.K]
+            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)            
             self.cluster_analyzer.repartition()
             self.cluster_analyzer.sort_clusters()
             self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
@@ -151,24 +150,21 @@ class MismatchFirstFarthestTraversal(MAL1):
         """        
         Farthest-first traversal on a subset with respect to labeled data points.
         """
-        tmp_U = np.copy(self.U) if U is None else np.copy(U)  # Unlabeled data, without to be labeled in the batch
-        tmp_L = np.copy(self.L)  # Labeled data and to be labeled in the batch
         selection_samples = []
 
+        nn_dist = np.zeros(len(U))
+        for i in range(len(U)):
+            nn_dist[i] = np.min(self.dist_mat[U[i]][self.L])
+    
         for i in range(n):
-            if not tmp_L.any():  # The very first sample is randomly selected
-                s_index = np.random.randint(len(tmp_U))
+            if not self.L.any():  # The very first sample is randomly selected
+                s_index = np.random.randint(len(U))
             else:
-                nn_dist = np.zeros(len(tmp_U))  # Store the nearest neighbour distance
-                for j in range(len(tmp_U)):
-                    nn_dist[j] = np.min(self.dist_mat[tmp_U[j]][tmp_L])
                 s_index = np.argmax(nn_dist)
+                update_mask = self.dist_mat[U[s_index]][U] < nn_dist
+                nn_dist[update_mask] = self.dist_mat[U[s_index]][U[update_mask]]
+            selection_samples.append(U[s_index])
 
-            s = tmp_U[s_index]
-            selection_samples.append(s)
-            tmp_L = np.array(self.L.tolist()+selection_samples)  # Labeled and to be labeled in the same batch
-            tmp_U = np.delete(tmp_U, s_index)
-            
         return np.array(selection_samples)
 
     def compare_predictions(self):
@@ -214,8 +210,10 @@ class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
 
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
-            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
-            #self.cluster_analyzer.medoids = np.random.permutation(self.X.shape[0])[:self.K]
+            traversal_size = int((self.initial_batch_size * self.X.shape[0])**0.5)
+            print ("traversal_size: {0}. Among them, the {1} samples with largest neighborhood will be selected in the first stage.".format(traversal_size, self.initial_batch_size))
+                    
+            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, traversal_size)
             self.cluster_analyzer.repartition()
             self.cluster_analyzer.sort_clusters()
             self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
@@ -231,7 +229,10 @@ class MismatchFirstLargestNeighborhood(MismatchFirstFarthestTraversal):
                 matched_mask, mismatched_mask = self.compare_predictions()
                 
                 if selection_size <= np.sum(mismatched_mask):
-                    selection = self.largest_neighborhood(selection_size, np.nonzero(mismatched_mask)[0])                     
+                    traversal_size = int((selection_size * np.sum(mismatched_mask))**0.5)
+                    print ("traversal_size: {0}".format(traversal_size))
+                    traversal_pool = self.farthest_traversal(traversal_size, np.nonzero(mismatched_mask)[0])                    
+                    selection = self.largest_neighborhood(selection_size, traversal_pool)
                 else:
                     selectionA = np.nonzero(mismatched_mask)[0]
                     selectionB = self.largest_neighborhood(selection_size - np.sum(mismatched_mask), np.nonzero(matched_mask)[0])
