@@ -17,6 +17,7 @@ def fully_supervised(X_train, y_train, X_test, y_test):
 def random_sampling(X_train, y_train, X_test, y_test):
     learner = ActiveLearner(X_train, initial_batch_size=200, batch_size=200)
     n_batch = 50
+    print("Query strategy: Random sampling...")
     for i in range(n_batch):
         print("Batch {0}:".format(i + 1))
         batch = learner.draw_next_batch()
@@ -36,42 +37,7 @@ def random_sampling(X_train, y_train, X_test, y_test):
 def mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test):
     learner = MismatchFirstLargestNeighborhood(X_train, initial_batch_size=200, batch_size=200)
     n_batch = 50
-    for i in range(n_batch):
-        print("Batch {0}:".format(i + 1))
-        batch = learner.draw_next_batch()
-        learner.annotate_batch(batch, y_train[batch])
-        print("Annotated instances: {0}".format(len(learner.L)))
-        
-        print("Training starts.")
-        learner.train_with_propagated_labels()
-        print("Training is done.")
-        
-        y_test_pred = learner.classifier.predict(X_test)
-
-        f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
-        print("The average F1 score is ", f1)
-
-def mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test):
-    learner = MismatchFirstLargestNeighborhood(X_train, batch_size=200, initial_batch_size=1000)
-    n_batch = 50
-    for i in range(n_batch):
-        print("Batch {0}:".format(i + 1))
-        batch = learner.draw_next_batch()
-        learner.annotate_batch(batch, y_train[batch])
-        print("Annotated instances: {0}".format(len(learner.L)))
-        
-        print("Training starts.")
-        learner.train_with_propagated_labels()
-        print("Training is done.")
-        
-        y_test_pred = learner.classifier.predict(X_test)
-
-        f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
-        print("The average F1 score is ", f1)
-
-def mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test):
-    learner = MismatchFirstLargestNeighborhood(X_train, batch_size=200, initial_batch_size=1000)
-    n_batch = 50
+    print("Query strategy: Mismatch first largest neigbourhood...")
     for i in range(n_batch):
         print("Batch {0}:".format(i + 1))
         batch = learner.draw_next_batch()
@@ -90,6 +56,7 @@ def mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test):
 def mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test):
     learner = MismatchFirstFarthestTraversal(X_train, initial_batch_size=1600, batch_size=200)
     n_batch = 50
+    print("Query strategy: Mismatch-first farthest-traversal...")
     for i in range(n_batch):
         print("Batch {0}:".format(i + 1))
         batch = learner.draw_next_batch()
@@ -119,8 +86,8 @@ if __name__ == '__main__':
     y_test = newsgroups_test.target
 
     # fully_supervised(X_train, y_train, X_test, y_test)
-    # The result with all the data labeled should be 81%-82%
+    # The accuracy with all the data labeled should be aroung 81%-82%
     
-    #random_sampling(X_train, y_train, X_test, y_test)
-    #mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test)
+    random_sampling(X_train, y_train, X_test, y_test)
+    mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test)
     mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test)
