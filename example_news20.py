@@ -2,7 +2,7 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
-from active_learning.core import ActiveLearner, MismatchFirstFarthestTraversal, LargestNeighborhood
+from active_learning.core import ActiveLearner, MAL1, MismatchFirstFarthestTraversal, LargestNeighborhood
 
 
 def fully_supervised(X_train, y_train, X_test, y_test):
@@ -98,5 +98,5 @@ if __name__ == '__main__':
     
 
     random_sampling(X_train, y_train, X_test, y_test)
-    mismatch_first_largest_neighborhood(X_train, y_train, X_test, y_test)
+    largest_neighborhood(X_train, y_train, X_test, y_test)
     mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test)
