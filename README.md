@@ -41,10 +41,10 @@ The visualization of the algorithm uses a binary classification problem, with 50
 ## Visualization on the model predictions with mismatch-first farthest-traversal
 Sample selection             |  Model prediction
 :-------------------------:|:-------------------------:
-![b1](http://zsy.fi/static/active/MFFT/b1.png) | ![a2](http://zsy.fi/static/active/MFFT/figure_a2.png)
-![b2](http://zsy.fi/static/active/MFFT/figure_b2.png)| ![a2](http://zsy.fi/static/active/MFFT/figure_a3.png)
-![b3](http://zsy.fi/static/active/MFFT/figure_b3.png)| ![a3](http://zsy.fi/static/active/MFFT/figure_a4.png)
-![Image description](http://zsy.fi/static/active/MFFT/figure_b4.png)| ![Image description](http://zsy.fi/static/active/MFFT/figure_a5.png)
+![b1](http://zsy.fi/static/active/MFFT/b1.png) | ![a2](http://zsy.fi/static/active/MFFT/a2.png)
+![b2](http://zsy.fi/static/active/MFFT/b2.png)| ![a2](http://zsy.fi/static/active/MFFT/a3.png)
+![b3](http://zsy.fi/static/active/MFFT/b3.png)| ![a3](http://zsy.fi/static/active/MFFT/a4.png)
+![Image description](http://zsy.fi/static/active/MFFT/b4.png)| ![Image description](http://zsy.fi/static/active/MFFT/a5.png)
 
 
 
