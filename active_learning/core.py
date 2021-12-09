@@ -1,7 +1,7 @@
 import collections
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-
+import sklearn.metrics.pairwise
 from . import cluster
 
 
@@ -45,14 +45,15 @@ class MAL1(ActiveLearner):
         self.P = np.array([])  # indices of instances with propagated labels
         self.K = int(self.X.shape[0] / 4)  # Average cluster size of 4
 
-    @staticmethod
-    def compute_dist_mat(X):
+    def compute_dist_mat(self, X, metric='cosine'):
         """
         The computation of distance matrix based on inner product.
         It is equivalent to cosine distance when vector representations are normalized.
         """
-        dist_mat = np.dot(X, X.T)
-        dist_mat = 1 - dist_mat.toarray()
+        # dist_mat = np.dot(X, X.T)
+        if metric == 'cosine':
+            return self.compute_cosine_dist_mat(X)
+        dist_mat = sklearn.metrics.pairwise.euclidean_distances(X)
         print("Computation of distance matrix finished.")
         return dist_mat
 
@@ -111,22 +112,26 @@ class MismatchFirstFarthestTraversal(MAL1):
 
     def __init__(self, *args, **kwargs):
         super(MismatchFirstFarthestTraversal, self).__init__(*args, **kwargs)
+        self.dist_metric = 'cosine'
+        self.medoids_sort = 'size'
         # self.K = int(self.X.shape[0] / 10)  # Average cluster size of 10. The initial batch size should be smaller than 10% of the data.
         
     def draw_next_batch(self):
         "Generate medoids and draw the medoids from a deque."
 
         if not hasattr(self, 'dist_mat'):
-            self.dist_mat = self.compute_dist_mat(self.X)
+            self.dist_mat = self.compute_dist_mat(self.X, self.dist_metric)
 
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
             self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)            
             self.cluster_analyzer.repartition()
-            self.cluster_analyzer.sort_clusters()
+            if self.medoids_sort == 'size':
+                self.cluster_analyzer.sort_clusters(order_by='size')
             self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
 
         selection_batch = []
+
         while len(selection_batch) < self.batch_size:
             # Farthest traversal for the frist batch
             if self.medoids:
@@ -141,6 +146,8 @@ class MismatchFirstFarthestTraversal(MAL1):
                     selectionA = np.nonzero(mismatched_mask)[0]
                     selectionB = self.farthest_traversal(selection_size - np.sum(mismatched_mask), np.nonzero(matched_mask)[0])
                     selection = np.concatenate((selectionA, selectionB))
+                    print (selectionA, selectionB)
+                
                 selection_batch += selection.tolist()
                 
         self.n_batch += 1

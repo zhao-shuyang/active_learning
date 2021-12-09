@@ -95,7 +95,6 @@ if __name__ == '__main__':
 
     # fully_supervised(X_train, y_train, X_test, y_test)
     # The accuracy with all the data labeled should be aroung 81%-82%
-    
 
     random_sampling(X_train, y_train, X_test, y_test)
     largest_neighborhood(X_train, y_train, X_test, y_test)
