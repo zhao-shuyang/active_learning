@@ -20,7 +20,9 @@ Three example codes are currently given.
 [2] An active learning method using clustering and committee-based sample selection for sound event classification. Zhao S.Y., T. Heittola, T. Virtanen. In proc. 16th International Workshop on Acoustic Signal Enhancement (IWAENC), 2018. https://ieeexplore.ieee.org/document/8521336
 
 # Installation and running
-
+~~~
+python setup.py install
+~~~
 
 
 
