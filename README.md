@@ -1,4 +1,4 @@
-# Implementations of a few proximity-based active learning algorithm
+# Implementations of proximity-based active learning algorithms
 Active learning is typically used when unlabeled data is abundant, but labels are expensive or difficult to obtain. It aims at learning an optimal model with a limited labeling budget. Proximity-based active learning utilizes the underlying structure of the unlabeled data, selecting representatives of local 
 distributions. Some of the algorithms also takes informativeness of samples regarding an existing model. The implemented active learning alogrithms include
 
