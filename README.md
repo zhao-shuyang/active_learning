@@ -23,7 +23,7 @@ python setup.py install
 Three example codes using the actiev learning implementations are currently given. 
 
 - News20, a text classification dataest. 
-- An imaginary dataset described below.
+- An imaginary dataset described below. Visualization is given.
 - ESC-10, a sound classification dataset. This will be added later.
 
 ~~~
