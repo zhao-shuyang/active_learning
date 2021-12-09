@@ -8,12 +8,6 @@ distributions. Some of the algorithms also takes informativeness of samples rega
 
 Mismatch-first farthest-traversal is designed for cases where some of the classes are rare. The original medoid-based active learning and largest neigbhourhood method is suitable for the cases that classes are generally evenly distributed.
 
-Three example codes are currently given. 
-
-- News20, a text classification dataest. 
-- An imaginary dataset described below.
-- ESC-10, a sound classification dataset. This will be added later.
-
 
 [1] Active learning for sound event classification by clustering unlabeled data. Zhao S.Y., T. Heittola, T. Virtanen. In proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), p. 751--755, 2017. https://ieeexplore.ieee.org/document/7952256
 
@@ -21,10 +15,22 @@ Three example codes are currently given.
 
 # Installation and running
 ~~~
+git clone https://github.com/zhao-shuyang/active_learning.git
+cd active_learning
 python setup.py install
 ~~~
 
+Three example codes using the actiev learning implementations are currently given. 
 
+- News20, a text classification dataest. 
+- An imaginary dataset described below.
+- ESC-10, a sound classification dataset. This will be added later.
+
+~~~
+python example_news20.py
+python example_imaginary.py
+python example_esc10.py
+~~~
 
 # An imaginary problem
 The visualization of the algorithm uses a binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The traget decision boundaries are marked with two blue triangles. The labeling budget is 500. In each batch, 100 data points are queried for labels.
