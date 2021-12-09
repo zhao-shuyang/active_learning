@@ -1,5 +1,12 @@
-# Active learning with mismatch-first farthest-traversal
-Active learning is typically used when unlabeled data is abundant, but labels are expensive or difficult to obtain. It aims at learning an optimal model with a limited labeling budget. Mismatch-first farthest-traversal has been proposed for sound classification and sound event detection. However, it has a good potential to be extended to other problems.
+# Implementations of a few proximity-based active learning algorithm
+Active learning is typically used when unlabeled data is abundant, but labels are expensive or difficult to obtain. It aims at learning an optimal model with a limited labeling budget. Proximity-based active learning utilizes the underlying structure of the unlabeled data, selecting representatives of local 
+distributions. Some of the algorithms also takes informativeness of samples regarding an existing model. The implemented active learning alogrithms inclued medoid-based active learning, mismtatch-first farthest-traversal and largest neighbourhood. 
+
+Mismatch-first farthest-traversal is designed for cases where some of the classes are rare. The original medoid-based active learning and largest neigbhourhood method is suitable for the cases that classes are generally evenly distributed.
+
+Two example codes are currently given. One is for news20, a text classification dataest. The other is for an imaginary dataset described below.
+
+
 
 ## An imaginary problem
 The visualization of the algorithm uses a binary classification problem, with 5000 randomly generated data points. The data points belong to two classes, visualized with green and blue. The traget decision boundaries are marked with two blue triangles. The labeling budget is 500. In each batch, 100 data points are queried for labels.
