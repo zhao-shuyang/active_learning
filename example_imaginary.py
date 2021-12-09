@@ -69,7 +69,7 @@ def random_sampling_process(X_train, y_train, X_test, y_test):
         print("Training is done.")
         
         y_test_pred = learner.classifier.predict(X_test)
-
+        
         f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
         print("The average F1 score is ", f1)
 
@@ -81,7 +81,7 @@ def mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test):
                                              batch_size=100,
                                              classifier=GradientBoostingClassifier())
     learner.dist_metric = 'euclidean'
-    
+    learner.medoids_sort = 'distance'
     # n_batch = int(len(X_train) / learner.batch_size)
     n_batch = 5
     print("Query strategy: Mismatch-first farthest-traversal...")
@@ -92,13 +92,14 @@ def mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test):
         print("Annotated instances: {0}".format(len(learner.L)))
 
         
-        plot_data(X_train[learner.L], y_train[learner.L])
+        #plot_data(X_train[learner.L], y_train[learner.L])
         
         print("Training starts.")
         learner.train()
         print("Training is done.")
         
         y_test_pred = learner.classifier.predict(X_test)
+        plot_data(X_test, y_test_pred)
 
         f1 = metrics.f1_score(y_test, y_test_pred, average='macro')
         print("The average F1 score is ", f1)
@@ -116,6 +117,7 @@ if __name__ == '__main__':
     X_train, y_train = data_generation(n=5000)
     X_test, y_test = data_generation(n=1000)
     #random_sampling_process(X_train, y_train, X_test, y_test)
+    plot_data(X_train, y_train)
     mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test)
 #MFFT(X)
 

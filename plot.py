@@ -223,8 +223,9 @@ def nnp(X, L, U):
         y2[i] = y[nearest_neighbour]
     return y2
     
-#uncertainty_sampling(X)
 if __name__ == '__main__':
-    farthest_traversal(X)
-#MFFT(X)
+    uncertainty_sampling(X)
+
+    #farthest_traversal(X)
+    #MFFT(X)
 
