@@ -23,6 +23,8 @@ setup(
         'matplotlib==3.5.0',
         'numpy==1.21.4',
         'scikit-learn==1.0.1',
-        'scipy==1.7.3'
+        'scipy==1.7.3',
+        'pandas',
+        'soundfile'        
     ]
     )

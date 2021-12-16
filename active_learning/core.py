@@ -63,7 +63,7 @@ class MAL1(ActiveLearner):
         dot_product = np.dot(X, X.T)
         vec_norms = np.linalg.norm(X, axis=1)
         norm_product = np.outer(vec_norms, vec_norms)
-        return dot_product / norm_product
+        return 1 - dot_product / norm_product
 
     @staticmethod
     def clustering(dist_mat, K, order_by="size"):
@@ -121,14 +121,16 @@ class MismatchFirstFarthestTraversal(MAL1):
 
         if not hasattr(self, 'dist_mat'):
             self.dist_mat = self.compute_dist_mat(self.X, self.dist_metric)
-
+            
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
-            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)            
+            self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
+            #print (self.cluster_analyzer.medoids)
             self.cluster_analyzer.repartition()
             if self.medoids_sort == 'size':
                 self.cluster_analyzer.sort_clusters(order_by='size')
             self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
+            
 
         selection_batch = []
 

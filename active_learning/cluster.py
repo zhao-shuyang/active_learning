@@ -19,11 +19,13 @@ def farthest_search(dist_mat, k):
     medoids = [init_medoid]
     print ("Farthest-first traversal of {0} over {1} samples".format(k, N))
     nn_dist = np.zeros((N))
+
     """
-    for i in tqdm(range(1, k)):
+    for i in range(1, k):
         for j in range(N):
-            dist[j] = np.min(dist_mat[j][np.array(medoids)])
-        medoids.append(np.argmax(dist))
+            nn_dist[j] = np.min(dist_mat[j][np.array(medoids)])
+
+        medoids.append(np.argmax(nn_dist))
     """
     for i in range(N):
         nn_dist[i] = np.min(dist_mat[i][np.array(medoids)])
@@ -33,7 +35,7 @@ def farthest_search(dist_mat, k):
         medoids.append(new_medoid)
         update_mask = dist_mat[new_medoid, :] < nn_dist
         nn_dist[update_mask] = dist_mat[new_medoid][update_mask]
-        
+
     return np.array(medoids)
 
 
