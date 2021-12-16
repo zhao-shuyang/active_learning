@@ -105,13 +105,6 @@ def mismatch_first_farthest_traversal(X_train, y_train, X_test, y_test):
         print("The average F1 score is ", f1)
 
 
-
-
-
-
-
-
-
 #uncertainty_sampling(X)
 if __name__ == '__main__':
     X_train, y_train = data_generation(n=5000)
