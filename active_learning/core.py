@@ -92,15 +92,17 @@ class MAL1(ActiveLearner):
                     print("Medoids are exhausted.")
             self.n_batch += 1
             return np.array(selection_batch)
-                   
+
     def train_with_propagated_labels(self):
-        tmp_P = self.P.tolist()
-        for i, sample in enumerate(self.L):
+        tmp_P = [] 
+        for sample in self.L:
             for cluster_member in self.cluster_analyzer.clusters[sample]:
-                self.y[cluster_member] = self.y[i]
+                self.y[cluster_member] = self.y[sample]
                 tmp_P.append(cluster_member)
         self.P = np.array(tmp_P)
+
         self.classifier.fit(self.X[self.P], self.y[self.P])
+
 
 
 class MismatchFirstFarthestTraversal(MAL1):
