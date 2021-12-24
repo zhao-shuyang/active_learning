@@ -5,12 +5,18 @@ import librosa
 import pandas as pd
 import numpy as np
 import h5py
+import matplotlib.pyplot as plt
 
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
+from sklearn.manifold import TSNE
+import seaborn as sns
+#from yellowbrick.text import TSNEVisualizer
+
 from active_learning.core import ActiveLearner, MAL1, MismatchFirstFarthestTraversal, LargestNeighborhood
 from active_learning.net_arch import Cnn14
 
+    
 
 model = Cnn14(sample_rate=32000, window_size=1024, hop_size=320, mel_bins=64,fmin=50,fmax=14000,classes_num=527)
 checkpoint = torch.load('weights/Cnn14_mAP=0.431.pth', map_location='cpu')
@@ -38,6 +44,8 @@ def get_features(audio_file):
 def generate_dataset(audio_root, file_meta, test_fold=1):
     df_esc50 = pd.read_csv(file_meta, sep=',')
     class_list = sorted(df_esc50.loc[df_esc50['esc10']==True]['category'].unique())
+    print (class_list)
+    return
     
     df_esc10_train = df_esc50[(df_esc50['fold'] != test_fold) & (df_esc50['esc10']==True)]
     df_esc10_test = df_esc50[(df_esc50['fold'] == test_fold) & (df_esc50['esc10']==True)]
@@ -129,8 +137,46 @@ def mismatch_first_farthest_traversal(h5_path):
         print("The average F1 score is ", f1)
 
 
-        
+def tsne_plot(h5_path):
+    
+    f = h5py.File(h5_path, 'r')
+    X_train, y_train, X_test, y_test = f["X_train"][:], f["y_train"][:], f["X_test"][:], f["y_test"][:]
+    dist_mat = MAL1.compute_cosine_dist_mat(X_train)
+
+    X_train_2d = TSNE(n_components=2, learning_rate='auto',
+                      init='random', metric='precomputed').fit_transform(np.abs(dist_mat))
+    class_list = ['chainsaw', 'clock_tick', 'crackling_fire', 'crying_baby', 'dog', 'helicopter', 'rain', 'rooster', 'sea_waves', 'sneezing']
+
+    """
+    tsne = TSNEVisualizer()
+    selections = (y_train < 6)
+    X_train_selection = X_train[selections]
+    y_train_selection = y_train[selections]
+    y_train_str = []
+    for i in range(len(y_train_selection)):
+        y_train_str.append(class_list[int(y_train_selection[i])]) 
+    
+    tsne.fit(X_train_selection, y_train_str)
+    tsne.show()
+    """
+    
+    
+    # tsne = TSNEVisualizer()
+    df = pd.DataFrame()
+    df["y"] = y_train
+    df["x1"] = X_train_2d[:,0]
+    df["x2"] = X_train_2d[:,1]
+    sns.scatterplot(x="x1", y="x2", hue=df.y.tolist(),
+                    palette=sns.color_palette("hls", 10),
+                    data=df).set(title="T-SNE projection")
+    plt.legend(labels=class_list)
+    plt.show()
+    #print (X_train_selection.shape, len(y_train_str))
+    #tsne.fit(X_train, y_train_str)
+    
+    
 if __name__ == '__main__':
     # random_sampling("esc10_fold_1.hdf5")
-    mismatch_first_farthest_traversal("esc10_fold_1.hdf5")
-    
+    # mismatch_first_farthest_traversal("esc10_fold_1.hdf5")
+    tsne_plot("esc10_fold_1.hdf5")
+    #generate_dataset('ESC-50/audio', 'ESC-50/meta/esc50.csv')
