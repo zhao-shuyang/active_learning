@@ -116,7 +116,6 @@ class MismatchFirstFarthestTraversal(MAL1):
         super(MismatchFirstFarthestTraversal, self).__init__(*args, **kwargs)
         self.dist_metric = 'cosine'
         self.medoids_sort = 'size'
-        # self.K = int(self.X.shape[0] / 10)  # Average cluster size of 10. The initial batch size should be smaller than 10% of the data.
         
     def draw_next_batch(self):
         "Generate medoids and draw the medoids from a deque."
@@ -126,12 +125,14 @@ class MismatchFirstFarthestTraversal(MAL1):
             
         if not hasattr(self, 'cluster_analyzer'):
             self.cluster_analyzer = cluster.KMedoidClustering(self.dist_mat, self.K)
+            # self.cluster_analyzer = self.clustering(self.dist_mat, self.K)
             self.cluster_analyzer.medoids = cluster.farthest_search(self.dist_mat, self.K)
-            #print (self.cluster_analyzer.medoids)
             self.cluster_analyzer.repartition()
+            
             if self.medoids_sort == 'size':
                 self.cluster_analyzer.sort_clusters(order_by='size')
-            self.medoids = collections.deque(self.cluster_analyzer.medoids[:self.initial_batch_size])
+            self.medoids = collections.deque(self.cluster_analyzer.medoids)
+            print (self.medoids)
             
 
         selection_batch = []
@@ -201,12 +202,18 @@ class MismatchFirstFarthestTraversal(MAL1):
         return matched_mask, mismatched_mask
 
     def train_with_propagated_labels(self):
-        self.cluster_analyzer.medoids = self.L
-        self.cluster_analyzer.repartition()
+        tmp_P = []
+            
+        if len(self.L) > self.K:
+            self.cluster_analyzer.medoids = self.L
+            self.cluster_analyzer.repartition()
+            
         for sample in self.L:
             for cluster_member in self.cluster_analyzer.clusters[sample]:
                 self.y[cluster_member] = self.y[sample]
-        self.classifier.fit(self.X, self.y)
+                tmp_P.append(cluster_member)
+        self.P = np.array(tmp_P)
+        self.classifier.fit(self.X[self.P], self.y[self.P])
 
 
 class LargestNeighborhood(MismatchFirstFarthestTraversal):

@@ -152,6 +152,7 @@ def mismatch_first_farthest_traversal(h5_path):
     dist_mat = MAL1.compute_cosine_dist_mat(X_train)
     X_train_2d = TSNE(n_components=2, learning_rate='auto',
                       init='random', metric='precomputed').fit_transform(np.abs(dist_mat))
+    tsne_plot(X_train_2d, y_train)
     
     learner = MismatchFirstFarthestTraversal(X_train, initial_batch_size=20, batch_size=20, classifier=LogisticRegression(max_iter=500))
     learner.K = 80
@@ -169,6 +170,7 @@ def mismatch_first_farthest_traversal(h5_path):
         print("Training is done.")
 
         tsne_plot(X_train_2d[learner.L], learner.y[learner.L])
+        tsne_plot(X_train_2d[learner.P], learner.y[learner.P])
         
         y_test_pred = learner.classifier.predict(X_test)
 
@@ -198,8 +200,8 @@ def tsne_plot(X_2d, y, subset=None):
     
 if __name__ == '__main__':
     # random_sampling("esc10_fold_1.hdf5")
-    # mismatch_first_farthest_traversal("esc10_fold_1.hdf5")
-    recursive_MAL("esc10_fold_1.hdf5")
+    mismatch_first_farthest_traversal("esc10_fold_1.hdf5")
+    # recursive_MAL("esc10_fold_1.hdf5")
     
     """
     h5_path = "esc10_fold_1.hdf5"
